@@ -1,7 +1,7 @@
 package models
 
 type Product struct {
-	id    string
+	token string
 	name  string
 	price float32
 }
