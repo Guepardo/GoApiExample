@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"exemple.com/api/controllers"
+	"exemple.com/api/repositories"
 	"github.com/gorilla/mux"
 )
 
@@ -22,8 +23,14 @@ func (app *App) Start(port string) {
 	log.Fatal(http.ListenAndServe(port, app.Router))
 }
 
+func (app *App) initializeMiddlewares() {
+	app.Router.Use()
+}
+
 func (app *App) initializeRouters() {
-	productsController := controllers.ProductsController{}
+	productsController := controllers.ProductsController{
+		Repo: &repositories.ProductRepository{},
+	}
 
 	app.Router.HandleFunc("/products", productsController.Index).Methods("GET")
 	app.Router.HandleFunc("/products", productsController.Store).Methods("POST")

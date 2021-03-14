@@ -1,7 +1,7 @@
 package models
 
 type Product struct {
-	token string
-	name  string
-	price float32
+	BasicModel
+	Name  string  `json:name`
+	Price float64 `json:price`
 }
