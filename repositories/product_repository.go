@@ -2,52 +2,33 @@ package repositories
 
 import (
 	"exemple.com/api/models"
+	"gorm.io/gorm"
 )
 
 type ProductRepository struct {
-	data map[string]models.Product
-}
-
-func (repo *ProductRepository) initRepo() {
-	if repo.data == nil {
-		repo.data = make(map[string]models.Product)
-	}
+	DB *gorm.DB
 }
 
 func (repo *ProductRepository) Insert(product models.Product) (models.Product, error) {
-	repo.initRepo()
-	repo.data[product.Token] = product
-
+	repo.DB.Create(&product)
 	return product, nil
 }
 
 func (repo *ProductRepository) List() ([]models.Product, error) {
-	repo.initRepo()
-	var values []models.Product
-
-	for _, value := range repo.data {
-		values = append(values, value)
-	}
-
-	return values, nil
+	var products []models.Product
+	repo.DB.Find(&products)
+	return products, nil
 }
 
-func (repo *ProductRepository) Delete(token string) error {
-	repo.initRepo()
-	delete(repo.data, token)
+func (repo *ProductRepository) Delete(id int) error {
+	repo.DB.Delete(&models.Product{}, 1)
 	return nil
 }
 
-func (repo *ProductRepository) Update(token string, data models.Product) error {
-	repo.initRepo()
-	product := repo.data[token]
-
-	product.Name = data.Name
-	product.Price = data.Price
-
+func (repo *ProductRepository) Update(id int, data models.Product) error {
 	return nil
 }
 
-func (repo *ProductRepository) Find(token string) models.Product {
-	return repo.data[token]
+func (repo *ProductRepository) Find(id int) models.Product {
+	return models.Product{}
 }

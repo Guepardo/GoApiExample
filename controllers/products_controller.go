@@ -3,6 +3,7 @@ package controllers
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"exemple.com/api/models"
 	"exemple.com/api/repositories"
@@ -11,7 +12,7 @@ import (
 
 type ProductsController struct {
 	BaseController
-	Repo *repositories.ProductRepository
+	Repo repositories.ProductRepository
 }
 
 func (con *ProductsController) Store(w http.ResponseWriter, r *http.Request) {
@@ -26,7 +27,6 @@ func (con *ProductsController) Store(w http.ResponseWriter, r *http.Request) {
 
 	defer r.Body.Close()
 
-	product.GenerateToken()
 	persistedProduct, err := con.Repo.Insert(product)
 
 	if err != nil {
@@ -38,20 +38,15 @@ func (con *ProductsController) Store(w http.ResponseWriter, r *http.Request) {
 }
 
 func (con *ProductsController) Show(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-
-	if err := con.Repo.Delete(vars["id"]); err != nil {
-		con.renderJson(w, http.StatusNoContent, nil)
-		return
-	}
-
 	con.renderMessage(w, http.StatusInternalServerError, "Internal Server Error")
 }
 
 func (con *ProductsController) Delete(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
-	if err := con.Repo.Delete(vars["id"]); err == nil {
+	id, _ := strconv.Atoi(vars["id"])
+
+	if err := con.Repo.Delete(id); err == nil {
 		con.renderJson(w, http.StatusNoContent, nil)
 		return
 	}
@@ -78,5 +73,6 @@ func (con *ProductsController) Update(w http.ResponseWriter, r *http.Request) {
 
 	defer r.Body.Close()
 
-	con.Repo.Update(vars["id"], product)
+	id, _ := strconv.Atoi(vars["id"])
+	con.Repo.Update(id, product)
 }
